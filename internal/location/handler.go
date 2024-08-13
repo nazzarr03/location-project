@@ -69,5 +69,29 @@ func (h *LocationHandler) GetLocationByID(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(location)
+}
 
+func (h *LocationHandler) UpdateLocation(c *fiber.Ctx) error {
+	req := new(UpdateLocationRequest)
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	location := &entity.Location{
+		Name:      req.Name,
+		Latitude:  req.Latitude,
+		Longitude: req.Longitude,
+		Color:     req.Color,
+	}
+
+	if err := validation.ValidateLocation(location); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	locations, err := h.LocationService.UpdateLocation(req)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(locations)
 }

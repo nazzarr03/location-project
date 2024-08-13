@@ -65,3 +65,18 @@ func (s *LocationService) GetLocationByID(id uint) (*LocationDTO, error) {
 
 	return locationDTO, nil
 }
+
+func (s *LocationService) UpdateLocation(locationDTO *UpdateLocationRequest) (*entity.Location, error) {
+	location := new(entity.Location)
+	err := utils.DTOtoJSON(locationDTO, location)
+	if err != nil {
+		return nil, errors.New("Failed to convert locationDTO to location")
+	}
+
+	err = s.LocationRepository.UpdateLocation(location)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to update location")
+	}
+
+	return location, nil
+}

@@ -34,6 +34,7 @@ func main() {
 	locationApi.Post("/", locationHandler.CreateLocation)
 	locationApi.Get("/", locationHandler.GetLocations)
 	locationApi.Get("/:id", locationHandler.GetLocationByID)
+	locationApi.Put("/", locationHandler.UpdateLocation)
 
 	app.Listen(":8081")
 }

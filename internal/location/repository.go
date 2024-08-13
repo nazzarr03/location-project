@@ -46,3 +46,11 @@ func (r *LocationRepository) GetLocationByID(id uint) (*entity.Location, error) 
 
 	return location, nil
 }
+
+func (r *LocationRepository) UpdateLocation(location *entity.Location) error {
+	if err := r.Db.Updates(location).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
