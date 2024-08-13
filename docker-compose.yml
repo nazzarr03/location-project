@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: location_project
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_NAME: mydatabase
+      DB_PORT: 3306
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: go run cmd/main.go
+    depends_on:
+      - db
+    networks:
+      - mysql-network
+  
+  db:
+    container_name: location_db
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: location
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - mysql-network
+  
+networks:
+  mysql-network:
+    driver: bridge
+
+volumes:
+  db_data:
