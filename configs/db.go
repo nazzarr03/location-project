@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/nazzarr03/location-project/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -37,7 +38,7 @@ func ConnectDB() {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 
-	if err := Db.AutoMigrate(); err != nil {
+	if err := Db.AutoMigrate(&models.Location{}, &models.Route{}); err != nil {
 		log.Fatalf("Error migrating database: %v", err)
 	}
 
