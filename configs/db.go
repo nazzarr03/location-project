@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/nazzarr03/location-project/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -14,14 +13,6 @@ import (
 var (
 	Db *gorm.DB
 )
-
-func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Print(".env file not found")
-	}
-
-	ConnectDB()
-}
 
 func ConnectDB() {
 	var err error
