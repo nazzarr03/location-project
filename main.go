@@ -33,6 +33,7 @@ func main() {
 	locationApi := api.Group("/locations")
 	locationApi.Post("/", locationHandler.CreateLocation)
 	locationApi.Get("/", locationHandler.GetLocations)
+	locationApi.Get("/:id", locationHandler.GetLocationByID)
 
 	app.Listen(":8081")
 }

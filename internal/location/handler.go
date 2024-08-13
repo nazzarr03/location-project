@@ -1,6 +1,8 @@
 package location
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/nazzarr03/location-project/db/entity"
 	"github.com/nazzarr03/location-project/pkg/validation"
@@ -51,4 +53,21 @@ func (h *LocationHandler) GetLocations(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(locations)
+}
+
+func (h *LocationHandler) GetLocationByID(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	locationID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	location, err := h.LocationService.GetLocationByID(uint(locationID))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(location)
+
 }

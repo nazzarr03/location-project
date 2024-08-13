@@ -50,3 +50,18 @@ func (s *LocationService) GetLocations(req *BaseRequest) (*LocationResponseDTO, 
 
 	return &resultDTO, nil
 }
+
+func (s *LocationService) GetLocationByID(id uint) (*LocationDTO, error) {
+	location, err := s.LocationRepository.GetLocationByID(id)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to get location by id")
+	}
+
+	locationDTO := new(LocationDTO)
+	err = utils.JSONtoDTO(location, locationDTO)
+	if err != nil {
+		return nil, errors.New("Failed to convert location to locationDTO")
+	}
+
+	return locationDTO, nil
+}

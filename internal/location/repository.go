@@ -37,3 +37,12 @@ func (r *LocationRepository) GetLocations(req *BaseRequest) ([]entity.Location, 
 
 	return locations, nil
 }
+
+func (r *LocationRepository) GetLocationByID(id uint) (*entity.Location, error) {
+	location := new(entity.Location)
+	if err := r.Db.First(location, id).Error; err != nil {
+		return nil, err
+	}
+
+	return location, nil
+}
