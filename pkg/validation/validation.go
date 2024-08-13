@@ -2,7 +2,7 @@ package validation
 
 import (
 	"github.com/go-playground/validator/v10"
-	"github.com/nazzarr03/location-project/models"
+	"github.com/nazzarr03/location-project/db/entity"
 )
 
 var (
@@ -55,25 +55,10 @@ func PositiveValidation(fl validator.FieldLevel) bool {
 	return value > 0
 }
 
-func ValidateLocation(location *models.Location) error {
+func ValidateLocation(location *entity.Location) error {
 	return ValidateStruct(location)
 }
 
-func ValidateRoute(route *models.Route) error {
+func ValidateRoute(route *entity.Route) error {
 	return ValidateStruct(route)
 }
-
-/* func main() {
-	location := models.Location{
-		Name:      "Sample Location",
-		Latitude:  40.712776,
-		Longitude: -74.005974,
-		Color:     "#FF5733",
-	}
-
-	if err := models.ValidateLocation(location); err != nil {
-		fmt.Println("Validation failed:", err)
-	} else {
-		fmt.Println("Validation succeeded!")
-	}
-} */

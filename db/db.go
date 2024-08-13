@@ -1,18 +1,16 @@
-package config
+package db
 
 import (
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/nazzarr03/location-project/models"
+	"github.com/nazzarr03/location-project/db/entity"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-var (
-	Db *gorm.DB
-)
+var Db *gorm.DB
 
 func ConnectDB() {
 	var err error
@@ -29,7 +27,7 @@ func ConnectDB() {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 
-	if err := Db.AutoMigrate(&models.Location{}, &models.Route{}); err != nil {
+	if err := Db.AutoMigrate(&entity.Location{}, &entity.Route{}); err != nil {
 		log.Fatalf("Error migrating database: %v", err)
 	}
 

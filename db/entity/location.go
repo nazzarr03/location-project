@@ -1,8 +1,6 @@
-package models
+package entity
 
-import (
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 type Location struct {
 	gorm.Model
