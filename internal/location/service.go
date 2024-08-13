@@ -28,3 +28,25 @@ func (s *LocationService) CreateLocation(locationDTO *CreateLocationRequest) (*e
 
 	return createdLocation, nil
 }
+
+func (s *LocationService) GetLocations(req *BaseRequest) (*LocationResponseDTO, error) {
+	locations, err := s.LocationRepository.GetLocations(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to get locations")
+	}
+	locationDTOs := []LocationDTO{}
+	for i := range locations {
+		locationDTO := new(LocationDTO)
+		err := utils.JSONtoDTO(&locations[i], locationDTO)
+		if err != nil {
+			return nil, errors.New("Failed to convert location to locationDTO")
+		}
+		locationDTOs = append(locationDTOs, *locationDTO)
+	}
+
+	var resultDTO LocationResponseDTO
+	resultDTO.Count = len(locationDTOs)
+	resultDTO.Data = locationDTOs
+
+	return &resultDTO, nil
+}

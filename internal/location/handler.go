@@ -38,3 +38,17 @@ func (h *LocationHandler) CreateLocation(c *fiber.Ctx) error {
 
 	return c.JSON(location)
 }
+
+func (h *LocationHandler) GetLocations(c *fiber.Ctx) error {
+	req := new(BaseRequest)
+	if err := c.QueryParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	locations, err := h.LocationService.GetLocations(req)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(locations)
+}

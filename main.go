@@ -17,7 +17,7 @@ func main() {
 	db.ConnectDB()
 
 	database := db.Db
-	
+
 	locationRepository := location.NewLocationRepository(database)
 	locationService := location.NewLocationService(locationRepository)
 	locationHandler := location.NewLocationHandler(locationService)
@@ -32,6 +32,7 @@ func main() {
 
 	locationApi := api.Group("/locations")
 	locationApi.Post("/", locationHandler.CreateLocation)
+	locationApi.Get("/", locationHandler.GetLocations)
 
 	app.Listen(":8081")
 }

@@ -20,3 +20,20 @@ func (r *LocationRepository) CreateLocation(location *entity.Location) (*entity.
 
 	return location, nil
 }
+
+func (r *LocationRepository) GetLocations(req *BaseRequest) ([]entity.Location, error) {
+	var locations []entity.Location
+	query := r.Db
+	if req.Limit != 0 {
+		query = query.Limit(req.Limit)
+	}
+	if req.Offset != 0 {
+		query = query.Offset(req.Offset)
+	}
+
+	if err := query.Find(&locations).Error; err != nil {
+		return nil, err
+	}
+
+	return locations, nil
+}
