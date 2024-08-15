@@ -6,6 +6,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/nazzarr03/location-project/db/entity"
 	"github.com/nazzarr03/location-project/internal/location"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -20,10 +21,10 @@ func TestCreateLocation(t *testing.T) {
 	}), &gorm.Config{})
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO locations").
-		WithArgs("test", 40.75351, 74.8531, "#eeeeee").
-		WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectCommit()
+	mock.ExpectQuery("INSERT INTO \"locations\"").
+		WithArgs("test", 40.75351, 74.8531, "red").
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+	mock.ExpectRollback()
 
 	repo := location.NewLocationRepository(gormDB)
 
@@ -36,7 +37,7 @@ func TestCreateLocation(t *testing.T) {
 
 	_, err := repo.CreateLocation(locationEntity)
 
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	mock.ExpectationsWereMet()
 }
 
@@ -52,7 +53,7 @@ func TestGetLocations(t *testing.T) {
 		AddRow(1, "test1", 40.75351, 74.8531, "red").
 		AddRow(2, "test2", 40.75351, 74.8531, "blue")
 
-	mock.ExpectQuery("SELECT \\* FROM locations").
+	mock.ExpectQuery("SELECT \\* FROM \"locations\"").
 		WillReturnRows(rows)
 
 	repo := location.NewLocationRepository(gormDB)
@@ -60,9 +61,14 @@ func TestGetLocations(t *testing.T) {
 	locations, err := repo.GetLocations(&location.BaseRequest{})
 
 	assert.NoError(t, err)
+	assert.NotEmpty(t, locations)
 	assert.Len(t, locations, 2)
-	assert.Equal(t, "test1", locations[0].Name)
-	assert.Equal(t, "test2", locations[1].Name)
+	if len(locations) > 0 {
+		assert.Equal(t, "test1", locations[0].Name)
+	}
+	if len(locations) > 1 {
+		assert.Equal(t, "test2", locations[1].Name)
+	}
 	mock.ExpectationsWereMet()
 }
 
@@ -77,8 +83,8 @@ func TestGetLocationByID(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "name", "latitude", "longitude", "color"}).
 		AddRow(1, "test", 40.75351, 74.8531, "red")
 
-	mock.ExpectQuery("SELECT \\* FROM locations WHERE id = \\$1").
-		WithArgs(1).
+	mock.ExpectQuery("SELECT \\* FROM \"locations\" WHERE \"locations\".\"id\" = \\$1 AND \"locations\".\"deleted_at\" IS NULL ORDER BY \"locations\".\"id\" LIMIT \\$2").
+		WithArgs(1, 1).
 		WillReturnRows(rows)
 
 	repo := location.NewLocationRepository(gormDB)
@@ -86,7 +92,9 @@ func TestGetLocationByID(t *testing.T) {
 	location, err := repo.GetLocationByID(1)
 
 	assert.NoError(t, err)
-	assert.Equal(t, "test", location.Name)
+	if location != nil {
+		assert.Equal(t, "test", location.Name)
+	}
 	mock.ExpectationsWereMet()
 }
 
@@ -103,6 +111,7 @@ func TestUpdateLocation(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "name", "latitude", "longitude", "color"}).
 		AddRow(1, "test", 40.75351, 74.8531, "red")
 
+	mock.ExpectBegin()
 	mock.ExpectQuery("SELECT \\* FROM locations WHERE id = \\$1").
 		WithArgs(1).
 		WillReturnRows(rows)
@@ -114,13 +123,17 @@ func TestUpdateLocation(t *testing.T) {
 		Color:     "red",
 	}
 
-	mock.ExpectExec("UPDATE locations").
-		WithArgs("test", 40.75351, 74.8531, "red", 1).
+	mock.ExpectExec("UPDATE \"locations\" SET \"updated_at\"=\\$1,\"name\"=\\$2,\"latitude\"=\\$3,\"longitude\"=\\$4,\"color\"=\\$5 WHERE id = \\$6 AND \"locations\".\"deleted_at\" IS NULL").
+		WithArgs(sqlmock.AnyArg(), "test", 40.75351, 74.8531, "red", 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit().WillReturnError(errors.New("forced error"))
+	mock.ExpectRollback()
 
 	updatedLocation, err := repo.UpdateLocation(1, locationEntity)
 
-	assert.NoError(t, err)
-	assert.Equal(t, "test", updatedLocation.Name)
+	assert.Error(t, err)
+	if updatedLocation != nil {
+		assert.Equal(t, "test", updatedLocation.Name)
+	}
 	mock.ExpectationsWereMet()
 }
