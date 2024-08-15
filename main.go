@@ -5,7 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
-	db "github.com/nazzarr03/location-project/db"
+	"github.com/nazzarr03/location-project/db"
 	"github.com/nazzarr03/location-project/internal/location"
 	"github.com/nazzarr03/location-project/pkg/middleware"
 )
