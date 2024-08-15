@@ -29,7 +29,7 @@ func TestCreateLocation(t *testing.T) {
 		Name:      "test",
 		Latitude:  40.75351,
 		Longitude: 74.8531,
-		Color:     "red",
+		Color:     "#eeeeee",
 	}
 
 	_, err := repo.CreateLocation(locationEntity)
