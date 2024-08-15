@@ -9,11 +9,11 @@ import (
 )
 
 type LocationHandler struct {
-	LocationService LocationService
+	LocationServiceInterface LocationServiceInterface
 }
 
-func NewLocationHandler(locationService *LocationService) *LocationHandler {
-	return &LocationHandler{LocationService: *locationService}
+func NewLocationHandler(locationService LocationServiceInterface) *LocationHandler {
+	return &LocationHandler{LocationServiceInterface: locationService}
 }
 
 func (h *LocationHandler) CreateLocation(c *fiber.Ctx) error {
@@ -33,7 +33,7 @@ func (h *LocationHandler) CreateLocation(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	location, err := h.LocationService.CreateLocation(req)
+	location, err := h.LocationServiceInterface.CreateLocation(req)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -47,7 +47,7 @@ func (h *LocationHandler) GetLocations(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	locations, err := h.LocationService.GetLocations(req)
+	locations, err := h.LocationServiceInterface.GetLocations(req)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -63,7 +63,7 @@ func (h *LocationHandler) GetLocationByID(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	location, err := h.LocationService.GetLocationByID(uint(locationID))
+	location, err := h.LocationServiceInterface.GetLocationByID(uint(locationID))
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -72,6 +72,13 @@ func (h *LocationHandler) GetLocationByID(c *fiber.Ctx) error {
 }
 
 func (h *LocationHandler) UpdateLocation(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	locationID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
 	req := new(UpdateLocationRequest)
 	if err := c.BodyParser(req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
@@ -88,10 +95,10 @@ func (h *LocationHandler) UpdateLocation(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	locations, err := h.LocationService.UpdateLocation(req)
+	location, err = h.LocationServiceInterface.UpdateLocation(uint(locationID), req)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	return c.JSON(locations)
+	return c.JSON(location)
 }

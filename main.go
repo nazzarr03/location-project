@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	db "github.com/nazzarr03/location-project/db"
 	"github.com/nazzarr03/location-project/internal/location"
+	"github.com/nazzarr03/location-project/pkg/middleware"
 )
 
 func main() {
@@ -19,10 +20,13 @@ func main() {
 	database := db.Db
 
 	locationRepository := location.NewLocationRepository(database)
-	locationService := location.NewLocationService(locationRepository)
+	locationService := location.NewLocationService(locationRepository.(*location.LocationRepository))
 	locationHandler := location.NewLocationHandler(locationService)
 
 	app := fiber.New()
+
+	// rate limiter middleware
+	app.Use(middleware.RateLimiter())
 
 	app.Get("/ping", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"message": "pong"})

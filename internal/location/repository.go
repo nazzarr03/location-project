@@ -9,7 +9,14 @@ type LocationRepository struct {
 	Db *gorm.DB
 }
 
-func NewLocationRepository(db *gorm.DB) *LocationRepository {
+type LocationRepositoryInterface interface {
+	CreateLocation(location *entity.Location) (*entity.Location, error)
+	GetLocations(req *BaseRequest) ([]entity.Location, error)
+	GetLocationByID(id uint) (*entity.Location, error)
+	UpdateLocation(id uint, location *entity.Location) (*entity.Location, error)
+}
+
+func NewLocationRepository(db *gorm.DB) LocationRepositoryInterface {
 	return &LocationRepository{Db: db}
 }
 
@@ -17,7 +24,6 @@ func (r *LocationRepository) CreateLocation(location *entity.Location) (*entity.
 	if err := r.Db.Create(location).Error; err != nil {
 		return nil, err
 	}
-
 	return location, nil
 }
 
@@ -30,11 +36,9 @@ func (r *LocationRepository) GetLocations(req *BaseRequest) ([]entity.Location, 
 	if req.Offset != 0 {
 		query = query.Offset(req.Offset)
 	}
-
 	if err := query.Find(&locations).Error; err != nil {
 		return nil, err
 	}
-
 	return locations, nil
 }
 
@@ -43,14 +47,12 @@ func (r *LocationRepository) GetLocationByID(id uint) (*entity.Location, error) 
 	if err := r.Db.First(location, id).Error; err != nil {
 		return nil, err
 	}
-
 	return location, nil
 }
 
-func (r *LocationRepository) UpdateLocation(location *entity.Location) error {
-	if err := r.Db.Updates(location).Error; err != nil {
-		return err
+func (r *LocationRepository) UpdateLocation(id uint, location *entity.Location) (*entity.Location, error) {
+	if err := r.Db.Model(&entity.Location{}).Where("id = ?", id).Updates(location).Error; err != nil {
+		return nil, err
 	}
-
-	return nil
+	return location, nil
 }
