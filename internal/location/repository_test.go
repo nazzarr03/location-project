@@ -19,9 +19,11 @@ func TestCreateLocation(t *testing.T) {
 		Conn: db,
 	}), &gorm.Config{})
 
+	mock.ExpectBegin()
 	mock.ExpectExec("INSERT INTO locations").
-		WithArgs("test", 40.75351, 74.8531, "red").
+		WithArgs("test", 40.75351, 74.8531, "#eeeeee").
 		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
 
 	repo := location.NewLocationRepository(gormDB)
 
