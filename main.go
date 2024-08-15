@@ -25,7 +25,6 @@ func main() {
 
 	app := fiber.New()
 
-	// rate limiter middleware
 	app.Use(middleware.RateLimiter())
 
 	app.Get("/ping", func(c *fiber.Ctx) error {
