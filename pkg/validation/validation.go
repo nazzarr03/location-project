@@ -58,7 +58,3 @@ func PositiveValidation(fl validator.FieldLevel) bool {
 func ValidateLocation(location *entity.Location) error {
 	return ValidateStruct(location)
 }
-
-func ValidateRoute(route *entity.Route) error {
-	return ValidateStruct(route)
-}

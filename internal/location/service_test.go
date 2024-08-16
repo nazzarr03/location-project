@@ -121,3 +121,57 @@ func TestServiceGetLocationByID(t *testing.T) {
 	assert.Equal(t, location.Name, locationDTO.Name)
 	mockRepo.AssertExpectations(t)
 }
+
+func TestServiceCreateRouteByID(t *testing.T) {
+	mockRepo := new(MockLocationRepository)
+
+	service := location.NewLocationService(mockRepo)
+
+	startLocation := &entity.Location{
+		Model:     gorm.Model{ID: 1},
+		Name:      "test",
+		Latitude:  40.7128,
+		Longitude: -74.0060,
+		Color:     "#FF0000",
+	}
+
+	locations := []entity.Location{
+		{
+			Model:     gorm.Model{ID: 2},
+			Name:      "test1",
+			Latitude:  40.730610,
+			Longitude: -73.935242,
+			Color:     "#FF0000",
+		},
+		{
+			Model:     gorm.Model{ID: 3},
+			Name:      "test2",
+			Latitude:  40.6643,
+			Longitude: -73.9385,
+			Color:     "#FF0000",
+		},
+
+		{
+			Model:     gorm.Model{ID: 4},
+			Name:      "test3",
+			Latitude:  40.730610,
+			Longitude: -73.935242,
+			Color:     "#FF0000",
+		},
+	}
+
+	mockRepo.On("GetLocationByID", startLocation.ID).Return(startLocation, nil)
+	mockRepo.On("GetLocations", mock.AnythingOfType("*location.BaseRequest")).Return(locations, nil)
+
+	locationResponseDTO, err := service.CreateRouteByID(startLocation.ID)
+
+	assert.NoError(t, err)
+	assert.Equal(t, 3, locationResponseDTO.Count)
+
+	expectedOrder := []string{"test1", "test3", "test2"}
+	for i, loc := range locationResponseDTO.Data {
+		assert.Equal(t, expectedOrder[i], loc.Name)
+	}
+
+	mockRepo.AssertExpectations(t)
+}

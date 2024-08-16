@@ -38,6 +38,7 @@ func main() {
 	locationApi.Get("/", locationHandler.GetLocations)
 	locationApi.Get("/:id", locationHandler.GetLocationByID)
 	locationApi.Put("/", locationHandler.UpdateLocation)
+	locationApi.Get("/route/:id", locationHandler.CreateRouteByID)
 
 	app.Listen(":8081")
 }

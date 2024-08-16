@@ -2,6 +2,7 @@ package location_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"net/http/httptest"
 	"testing"
 
@@ -38,6 +39,12 @@ func (m *MockLocationService) UpdateLocation(id uint, location *location.UpdateL
 	args := m.Called(id, location)
 	result := args.Get(0)
 	return result.(*entity.Location), args.Error(1)
+}
+
+func (m *MockLocationService) CreateRouteByID(id uint) (*location.LocationResponseDTO, error) {
+	args := m.Called(id)
+	result := args.Get(0)
+	return result.(*location.LocationResponseDTO), args.Error(1)
 }
 
 func TestHandlerCreateLocation(t *testing.T) {
@@ -97,5 +104,45 @@ func TestHandlerGetLocationByID(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, 200, resp.StatusCode)
+	mockService.AssertExpectations(t)
+}
+
+func TestHandlerCreateRouteByID(t *testing.T) {
+	mockService := new(MockLocationService)
+
+	handler := location.NewLocationHandler(mockService)
+
+	app := fiber.New()
+	app.Get("/api/v1/route/:id", handler.CreateRouteByID)
+
+	startLocationID := uint(1)
+
+	routeResponseDTO := &location.LocationResponseDTO{}
+	routeResponseDTO.Count = 3
+	routeResponseDTO.Data = []location.LocationDTO{
+		{Name: "test1"},
+		{Name: "test2"},
+		{Name: "test3"},
+	}
+
+	mockService.On("CreateRouteByID", startLocationID).Return(routeResponseDTO, nil)
+
+	req := httptest.NewRequest("GET", "/api/v1/route/1", nil)
+	resp, err := app.Test(req)
+
+	assert.NoError(t, err)
+	assert.Equal(t, 200, resp.StatusCode)
+
+	var responseBody location.LocationResponseDTO
+	if err := json.NewDecoder(resp.Body).Decode(&responseBody); err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, 3, responseBody.Count)
+
+	for i, loc := range responseBody.Data {
+		assert.Equal(t, routeResponseDTO.Data[i].Name, loc.Name)
+	}
+
 	mockService.AssertExpectations(t)
 }

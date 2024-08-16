@@ -102,3 +102,19 @@ func (h *LocationHandler) UpdateLocation(c *fiber.Ctx) error {
 
 	return c.JSON(location)
 }
+
+func (h *LocationHandler) CreateRouteByID(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	locationID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	route, err := h.LocationServiceInterface.CreateRouteByID(uint(locationID))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(route)
+}

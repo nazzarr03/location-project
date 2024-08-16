@@ -27,7 +27,7 @@ func ConnectDB() {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 
-	if err := Db.AutoMigrate(&entity.Location{}, &entity.Route{}); err != nil {
+	if err := Db.AutoMigrate(&entity.Location{}); err != nil {
 		log.Fatalf("Error migrating database: %v", err)
 	}
 
