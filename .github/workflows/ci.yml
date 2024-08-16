@@ -32,6 +32,11 @@ jobs:
     
     - name: Login to Docker Hub
       run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-    
+
+    - name: Debug Docker Login
+      run: |
+        echo "Username: ${{ secrets.DOCKER_USERNAME }}"
+        echo "Password: ${{ secrets.DOCKER_PASSWORD }}"
+
     - name: Push Docker Image
       run: docker tag location-project ${{ secrets.DOCKER_USERNAME }}/location-project
