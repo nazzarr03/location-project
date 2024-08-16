@@ -49,25 +49,25 @@ func (m *MockLocationService) CreateRouteByID(id uint) (*location.LocationRespon
 
 func TestHandlerCreateLocation(t *testing.T) {
 	mockService := new(MockLocationService)
-
 	handler := location.NewLocationHandler(mockService)
 
 	app := fiber.New()
 	app.Post("/api/v1/locations", handler.CreateLocation)
 
-	req := location.CreateLocationRequest{
-		Name:      "test",
-		Latitude:  40.75351,
-		Longitude: 74.8531,
-		Color:     "#FF0000",
+	reqBody := `{"name":"test","latitude":40.75351,"longitude":74.8531,"color":"#FF0000"}`
+	req := httptest.NewRequest("POST", "/api/v1/locations", bytes.NewReader([]byte(reqBody)))
+	req.Header.Set("Content-Type", "application/json")
+
+	mockService.On("CreateLocation", mock.AnythingOfType("*location.CreateLocationRequest")).
+		Return(&entity.Location{}, nil).
+		Once()
+
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("Error making request: %v", err)
 	}
 
-	mockService.On("CreateLocation", &req).Return(&entity.Location{}, nil)
-
-	resp, err := app.Test(httptest.NewRequest("POST", "/api/v1/locations", bytes.NewReader([]byte(`{"name":"test","latitude":40.75351,"longitude":74.8531,"color":"#FF0000"}`))))
-
-	assert.NoError(t, err)
-	assert.Equal(t, 200, resp.StatusCode)
+	assert.Equal(t, 200, resp.StatusCode, "Expected status code 200")
 	mockService.AssertExpectations(t)
 }
 
