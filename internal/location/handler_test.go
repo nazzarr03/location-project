@@ -52,12 +52,12 @@ func TestHandlerCreateLocation(t *testing.T) {
 		Name:      "test",
 		Latitude:  40.75351,
 		Longitude: 74.8531,
-		Color:     "red",
+		Color:     "#FF0000",
 	}
 
 	mockService.On("CreateLocation", &req).Return(&entity.Location{}, nil)
 
-	resp, err := app.Test(httptest.NewRequest("POST", "/api/v1/locations", bytes.NewReader([]byte(`{"name":"test","latitude":40.75351,"longitude":74.8531,"color":"red"}`))))
+	resp, err := app.Test(httptest.NewRequest("POST", "/api/v1/locations", bytes.NewReader([]byte(`{"name":"test","latitude":40.75351,"longitude":74.8531,"color":"#FF0000"}`))))
 
 	assert.NoError(t, err)
 	assert.Equal(t, 200, resp.StatusCode)

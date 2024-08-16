@@ -22,7 +22,7 @@ func TestCreateLocation(t *testing.T) {
 
 	mock.ExpectBegin()
 	mock.ExpectQuery("INSERT INTO \"locations\"").
-		WithArgs("test", 40.75351, 74.8531, "red").
+		WithArgs("test", 40.75351, 74.8531, "#FF0000").
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectRollback()
 
@@ -32,7 +32,7 @@ func TestCreateLocation(t *testing.T) {
 		Name:      "test",
 		Latitude:  40.75351,
 		Longitude: 74.8531,
-		Color:     "#eeeeee",
+		Color:     "#FF0000",
 	}
 
 	_, err := repo.CreateLocation(locationEntity)
@@ -50,8 +50,8 @@ func TestGetLocations(t *testing.T) {
 	}), &gorm.Config{})
 
 	rows := sqlmock.NewRows([]string{"id", "name", "latitude", "longitude", "color"}).
-		AddRow(1, "test1", 40.75351, 74.8531, "red").
-		AddRow(2, "test2", 40.75351, 74.8531, "blue")
+		AddRow(1, "test1", 40.75351, 74.8531, "#FF0000").
+		AddRow(2, "test2", 40.75351, 74.8531, "#eeeeee")
 
 	mock.ExpectQuery("SELECT \\* FROM \"locations\"").
 		WillReturnRows(rows)
@@ -81,7 +81,7 @@ func TestGetLocationByID(t *testing.T) {
 	}), &gorm.Config{})
 
 	rows := sqlmock.NewRows([]string{"id", "name", "latitude", "longitude", "color"}).
-		AddRow(1, "test", 40.75351, 74.8531, "red")
+		AddRow(1, "test", 40.75351, 74.8531, "#FF0000")
 
 	mock.ExpectQuery("SELECT \\* FROM \"locations\" WHERE \"locations\".\"id\" = \\$1 AND \"locations\".\"deleted_at\" IS NULL ORDER BY \"locations\".\"id\" LIMIT \\$2").
 		WithArgs(1, 1).
@@ -109,7 +109,7 @@ func TestUpdateLocation(t *testing.T) {
 	repo := location.NewLocationRepository(gormDB)
 
 	rows := sqlmock.NewRows([]string{"id", "name", "latitude", "longitude", "color"}).
-		AddRow(1, "test", 40.75351, 74.8531, "red")
+		AddRow(1, "test", 40.75351, 74.8531, "#FF0000")
 
 	mock.ExpectBegin()
 	mock.ExpectQuery("SELECT \\* FROM locations WHERE id = \\$1").
@@ -120,11 +120,11 @@ func TestUpdateLocation(t *testing.T) {
 		Name:      "test",
 		Latitude:  40.75351,
 		Longitude: 74.8531,
-		Color:     "red",
+		Color:     "#FF0000",
 	}
 
 	mock.ExpectExec("UPDATE \"locations\" SET \"updated_at\"=\\$1,\"name\"=\\$2,\"latitude\"=\\$3,\"longitude\"=\\$4,\"color\"=\\$5 WHERE id = \\$6 AND \"locations\".\"deleted_at\" IS NULL").
-		WithArgs(sqlmock.AnyArg(), "test", 40.75351, 74.8531, "red", 1).
+		WithArgs(sqlmock.AnyArg(), "test", 40.75351, 74.8531, "#FF0000", 1).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit().WillReturnError(errors.New("forced error"))
 	mock.ExpectRollback()

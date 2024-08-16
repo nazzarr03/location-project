@@ -46,14 +46,14 @@ func TestServiceCreateLocation(t *testing.T) {
 		Name:      "test",
 		Latitude:  40.75351,
 		Longitude: 74.8531,
-		Color:     "red",
+		Color:     "#FF0000",
 	}
 
 	locationDTO := &location.CreateLocationRequest{
 		Name:      "test",
 		Latitude:  40.75351,
 		Longitude: 74.8531,
-		Color:     "red",
+		Color:     "#FF0000",
 	}
 
 	mockRepo.On("CreateLocation", mock.AnythingOfType("*entity.Location")).Return(locationEntity, nil)
@@ -78,14 +78,14 @@ func TestServiceGetLocations(t *testing.T) {
 			Name:      "test1",
 			Latitude:  40.75351,
 			Longitude: 74.8531,
-			Color:     "red",
+			Color:     "#FF0000",
 		},
 		{
 			Model:     gorm.Model{ID: 2},
 			Name:      "test2",
 			Latitude:  40.75351,
 			Longitude: 74.8531,
-			Color:     "blue",
+			Color:     "#eeeeee",
 		},
 	}
 
@@ -110,10 +110,10 @@ func TestServiceGetLocationByID(t *testing.T) {
 		Name:      "test",
 		Latitude:  40.75351,
 		Longitude: 74.8531,
-		Color:     "red",
+		Color:     "#FF0000",
 	}
 
-	mockRepo.On("GetLocationByID", location.ID).Return(location, nil) // burada sıkıntı olursa uint(location.ID) yapabilirsin
+	mockRepo.On("GetLocationByID", location.ID).Return(location, nil)
 
 	locationDTO, err := service.GetLocationByID(location.ID)
 
